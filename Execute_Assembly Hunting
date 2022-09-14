@@ -1,4 +1,5 @@
 #Detect In-Memory .Net Assembly Modules Loaded from C2 Frameworks such as SilverC2, Metasploit.
+
 event_simpleName=ImageHash
 | rename FileName as Dll_Loaded FilePath as Dll_Path
 | join TargetProcessId_decimal
