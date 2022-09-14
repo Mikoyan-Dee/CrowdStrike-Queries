@@ -16,7 +16,7 @@ Note:
 - AuthenticationId_decimal=996  #network service
 - AuthenticationId_decimal=997 #local service
 
-#Detect In-Memory .Net Assembly Modules Loaded from C2 Frameworks such as SilverC2, Metasploit. (MITRE ATTACK ID: T1055)
+## Detect In-Memory .Net Assembly Modules Loaded from C2 Frameworks such as SilverC2, Metasploit. (MITRE ATTACK ID: T1055)
 
 ```
 event_simpleName=ImageHash
