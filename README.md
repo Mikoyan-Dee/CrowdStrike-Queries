@@ -41,10 +41,23 @@ event_simpleName="NewExecutableRenamed"
 
 Reference to https://lolbas-project.github.io/
 
+Method-1 "join"
+
 ```
 event_simpleName=DnsRequest
 | rename ContextProcessId_decimal as TargetProcessId_decimal
 | join TargetProcessId_decimal
     [search event_simpleName=ProcessRollup2 FileName IN ("powershell.exe", "certutil.exe", "regsvr32.exe", "rundll32.exe")]
 | table ComputerName ImageFileName DomainName CommandLine
+```
+
+Method-2 "mvappend"
+
+```
+event_simpleName IN ("*ProcessRollup2*") OR event_simpleName IN ("*DnsRequest*") 
+| eval PID=mvappend(ContextProcessId_decimal, TargetProcessId_decimal)
+| lookup userinfo.csv UserSid_readable OUTPUT UserName
+| stats values(ComputerName) values(UserName) as UserName values(event_simpleName) as event_simpleName  values(FileName) as ProcessName values(DomainName) as DomainName by PID
+| search ProcessName IN ("*rundll32.exe*", "*powershell.exe*", "*MpCmdRun.exe*")
+| where isnotnull(DomainName)
 ```
