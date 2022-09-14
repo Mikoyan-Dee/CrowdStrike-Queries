@@ -1,5 +1,5 @@
 # CrowdStrike-Queries
-CrowdStrike Falcon Queries For Advanced Attack Detection
+CrowdStrike Falcon Queries For Advanced Threat Detection
 
 ## Detect the persistent activities in Registry Run Key (MITRE ATTACK ID: T1547.001)
 
