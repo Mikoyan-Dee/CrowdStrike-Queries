@@ -1,4 +1,4 @@
-#Detect In-Memory .Net Assembly Modules Loaded from C2 Frameworks such as SilverC2, Metasploit.
+#Detect In-Memory .Net Assembly Modules Loaded from C2 Frameworks such as SilverC2, Metasploit. (MITRE ATTACK ID: T1055)
 
 event_simpleName=ImageHash
 | rename FileName as Dll_Loaded FilePath as Dll_Path
