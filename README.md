@@ -26,3 +26,25 @@ event_simpleName=ImageHash
 | search Dll_Loaded IN ("mscoree.dll", "clr.dll", "clrjit.dll", "mscorlib.ni.dll", "mscoreei.dll")
 | table ComputerName FileName CommandLine Dll_Loaded Dll_Path
 ```
+
+## Detect Renamed Executable - Masquerading (MITRE ATTACK ID: T1036.003)
+
+```
+event_simpleName="NewExecutableRenamed"
+| rename TargetFileName as ImageFileName
+| join ImageFileName 
+    [ search event_simpleName="ProcessRollup2" ]
+| table ComputerName SourceFileName ImageFileName CommandLine
+```
+
+## LOLBAS -Living Off The Land Binaries Execution (MITRE ATTACK ID: T1218)
+
+Reference to https://lolbas-project.github.io/
+
+```
+event_simpleName=DnsRequest
+| rename ContextProcessId_decimal as TargetProcessId_decimal
+| join TargetProcessId_decimal
+    [search event_simpleName=ProcessRollup2 FileName IN ("powershell.exe", "certutil.exe", "regsvr32.exe", "rundll32.exe")]
+| table ComputerName ImageFileName DomainName CommandLine
+```
