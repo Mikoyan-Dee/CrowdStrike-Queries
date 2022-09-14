@@ -15,3 +15,14 @@ Note:
 - AuthenticationId_decimal=999 #system level privs
 - AuthenticationId_decimal=996  #network service
 - AuthenticationId_decimal=997 #local service
+
+#Detect In-Memory .Net Assembly Modules Loaded from C2 Frameworks such as SilverC2, Metasploit. (MITRE ATTACK ID: T1055)
+
+```
+event_simpleName=ImageHash
+| rename FileName as Dll_Loaded FilePath as Dll_Path
+| join TargetProcessId_decimal
+    [search event_simpleName=ProcessRollup* FileName!=powershell.exe]
+| search Dll_Loaded IN ("mscoree.dll", "clr.dll", "clrjit.dll", "mscorlib.ni.dll", "mscoreei.dll")
+| table ComputerName FileName CommandLine Dll_Loaded Dll_Path
+```
