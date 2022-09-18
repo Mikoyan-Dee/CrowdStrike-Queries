@@ -1,9 +1,9 @@
 # CrowdStrike-Queries
-CrowdStrike Falcon Queries For Advanced Threat Detection
+<blockquote>CrowdStrike Falcon Queries For Advanced Threat Detection</blockquote>
 
 ## Detect the persistent activities in Registry Run Key (MITRE ATTACK ID: T1547.001)
 
-```
+```Splunk
 event_simpleName IN (AsepValueUpdate, RegGenericValueUpdate) 
 | search RegObjectName="*\\Software\\Microsoft\\Windows\\CurrentVersion*" AND AuthenticationId_decimal=999
 | rename RegOperationType_decimal as RegOperationType
@@ -16,6 +16,8 @@ Note:
 - AuthenticationId_decimal=996  #network service
 - AuthenticationId_decimal=997 #local service
 
+<br/>
+
 ## Detect In-Memory .Net Assembly Modules Loaded from C2 Frameworks such as SilverC2, Metasploit. (MITRE ATTACK ID: T1055)
 
 ```
@@ -27,6 +29,8 @@ event_simpleName=ImageHash
 | table ComputerName FileName CommandLine Dll_Loaded Dll_Path
 ```
 
+<br/>
+
 ## Detect Renamed Executable - Masquerading (MITRE ATTACK ID: T1036.003)
 
 ```
@@ -36,6 +40,8 @@ event_simpleName="NewExecutableRenamed"
     [ search event_simpleName="ProcessRollup2" ]
 | table ComputerName SourceFileName ImageFileName CommandLine
 ```
+
+<br/>
 
 ## LOLBAS -Living Off The Land Binaries Execution (MITRE ATTACK ID: T1218)
 
