@@ -1,14 +1,14 @@
 # CrowdStrike-Queries
-<blockquote>CrowdStrike Falcon Queries For Advanced Threat Detection</blockquote>
+<blockquote>CrowdStrike Logscale Queries For Advanced Threat Detection</blockquote>
 
 ## Detect the persistent activities in Registry Run Key (MITRE ATTACK ID: T1547.001)
 
-```Splunk
-event_simpleName IN (AsepValueUpdate, RegGenericValueUpdate) 
-| search RegObjectName="*\\Software\\Microsoft\\Windows\\CurrentVersion*" AND AuthenticationId_decimal=999
-| rename RegOperationType_decimal as RegOperationType
-| lookup local=true RegOperation.csv RegOperationType OUTPUT RegOperationName 
-| stats count by ComputerName RegObjectName RegValueName RegOperationName
+```Logscale
+#event_simpleName = /AsepValueUpdate|RegGenericValueUpdate/F platform = Win
+| RegObjectName=/\\Software\\Microsoft\\Windows\\CurrentVersion/iF AND AuthenticationId_decimal=999
+| rename( field = RegOperationType_decimal, as = RegOperationType)
+| match(file="RegOperations.csv", field=[RegOperationName]) 
+| groupBy([ComputerName, RegObjectName, RegValueName, RegOperationName], function=count())
 ```
 
 Note:
