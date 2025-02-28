@@ -7,7 +7,7 @@
 #event_simpleName = /AsepValueUpdate|RegGenericValueUpdate/F platform = Win
 | RegObjectName=/\\Software\\Microsoft\\Windows\\CurrentVersion/iF AND AuthenticationId_decimal=999
 | rename( field = RegOperationType_decimal, as = RegOperationType)
-| match(file="RegOperations.csv", field=[RegOperationName]) 
+| match(file="RegOperation.csv", field=[RegOperationName]) 
 | groupBy([ComputerName, RegObjectName, RegValueName, RegOperationName], function=count())
 ```
 
