@@ -70,11 +70,14 @@ Reference to https://lolbas-project.github.io/
 Method-1 "join"
 
 ```
-event_simpleName=DnsRequest
-| rename ContextProcessId_decimal as TargetProcessId_decimal
-| join TargetProcessId_decimal
-    [search event_simpleName=ProcessRollup2 FileName IN ("powershell.exe", "certutil.exe", "regsvr32.exe", "rundll32.exe")]
-| table ComputerName ImageFileName DomainName CommandLine
+// Filter DNS requests  
+#event_simpleName=DnsRequest  
+// Rename field for consistency  
+| rename(field = ContextProcessId_decimal, as=TargetProcessId_decimal)  
+// Join with process execution data for specific executables  
+| join(query={#event_simpleName=/ProcessRollup2/F FileName = /powershell\.exe|certutil\.exe|regsvr32\.exe|rundll32\.exe/iF}, field = TargetProcessId_decimal)  
+// Create a table with key fields  
+| table([ComputerName, ImageFileName, DomainName, CommandLine]) 
 ```
 
 Method-2 "mvappend"
