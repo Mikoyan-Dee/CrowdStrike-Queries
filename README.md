@@ -83,10 +83,20 @@ Method-1 "join"
 Method-2 "mvappend"
 
 ```
-event_simpleName IN ("*ProcessRollup2*") OR event_simpleName IN ("*DnsRequest*") 
-| eval PID=mvappend(ContextProcessId_decimal, TargetProcessId_decimal)
-| lookup userinfo.csv UserSid_readable OUTPUT UserName
-| stats values(ComputerName) values(UserName) as UserName values(event_simpleName) as event_simpleName  values(FileName) as ProcessName values(DomainName) as DomainName by PID
-| search ProcessName IN ("*rundll32.exe*", "*powershell.exe*", "*MpCmdRun.exe*")
-| where isnotnull(DomainName)
+// Filter for process execution and DNS request events  
+#event_simpleName = /ProcessRollup2/F OR #event_simpleName = /DnsRequest/F  
+// Assign process IDs for correlation  
+| falconPID := ContextProcessId | falconPID := TargetProcessId  
+// Self-join to link process and DNS events  
+| selfJoinFilter(field=[aid, falconPID], where=[{#event_simpleName=/ProcessRollup2/F}, {#event_simpleName=/DnsRequest/F}])  
+// Enrich with product and version details from CSV  
+| match(file="aid_master_main.csv", field=[aid], column=aid, include=[ProductType, Version])  
+// Group and collect relevant event data  
+| groupBy([aid, ComputerName, falconPID], function=([collect([#event_simpleName, FileName, DomainName, UserSid, UserName, ImageFileName, aip, LocalAddressIP4, LocalPort, Protocol, ProductType, Version])]))  
+// Enrich data with Falcon helper functions  
+| $falcon/helper:enrich(field=ProductType)  
+| $falcon/helper:enrich(field=Protocol)  
+// Filter for suspicious processes with DNS activity  
+| FileName=/rundll32\.exe|powershell\.exe|mpcmdrun\.exe/iF DomainName!=NULL  
+
 ```
