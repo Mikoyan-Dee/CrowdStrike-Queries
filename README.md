@@ -30,7 +30,7 @@ event_simpleName=ImageHash
 //Filter for processes that invoke the .NET runtime, which can be a sign of suspicious activity like C#-based malware execution
 | in(field="Dll_Loaded", values=["mscoree.dll", "clr.dll", "clrjit.dll", "mscorlib.ni.dll", "mscoreei.dll"], ignoreCase=true)
 //Grouping by Host and Process
-| groupBy([aid, ComputerName, falconPID], function=([collect([FileName, CommandLine, Dll_Loaded, Dll_Path])]))
+| groupBy([aid, ComputerName, TargetProcessId], function=([collect([FileName, CommandLine, Dll_Loaded, Dll_Path])]))
 //Display Results in Table Format
 | table([ComputerName, FileName, CommandLine, Dll_Loaded, Dll_Path])
 ```
