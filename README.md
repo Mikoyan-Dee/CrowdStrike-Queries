@@ -45,12 +45,15 @@ Note:
 
 ## Detect Renamed Executable - Masquerading (MITRE ATTACK ID: T1036.003)
 
-```
-event_simpleName="NewExecutableRenamed"
-| rename TargetFileName as ImageFileName
-| join ImageFileName 
-    [ search event_simpleName="ProcessRollup2" ]
-| table ComputerName SourceFileName ImageFileName CommandLine
+```Logscale
+//Detect renamed executables 
+#event_simpleName="NewExecutableRenamed"
+//Rename field for correlation in join query
+| rename(field=TargetFileName, as=ImageFileName)
+//Join with process execution data  
+| join(query={#event_simpleName=/ProcessRollup2/F}, field=[ImageFileName])  
+//Create a table with key fields 
+| table([aid, ComputerName, SourceFileName, ImageFileName, CommandLine])  
 ```
 
 <br/>
