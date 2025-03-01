@@ -35,6 +35,12 @@ event_simpleName=ImageHash
 | table([ComputerName, FileName, CommandLine, Dll_Loaded, Dll_Path])
 ```
 
+Note:
+- mscoree.dll – Core .NET runtime DLL.
+- clr.dll – Common Language Runtime (CLR).
+- clrjit.dll – Just-In-Time compiler for .NET.
+- mscorlib.ni.dll – Precompiled .NET core library.
+- mscoreei.dll – .NET execution engine.
 <br/>
 
 ## Detect Renamed Executable - Masquerading (MITRE ATTACK ID: T1036.003)
