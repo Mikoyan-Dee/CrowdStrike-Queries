@@ -4,10 +4,15 @@
 ## Detect the persistent activities in Registry Run Key (MITRE ATTACK ID: T1547.001)
 
 ```Logscale
-#event_simpleName = /AsepValueUpdate|RegGenericValueUpdate/F platform = Win
-| RegObjectName=/\\Software\\Microsoft\\Windows\\CurrentVersion/iF AND AuthenticationId_decimal=999
-| rename( field = RegOperationType_decimal, as = RegOperationType)
-| match(file="RegOperation.csv", field=[RegOperationName]) 
+// Filter registry changes in Windows  
+#event_simpleName = /AsepValueUpdate|RegGenericValueUpdate/F platform = Win  
+// Filter for specific registry paths and auth ID  
+| RegObjectName=/\\Software\\Microsoft\\Windows\\CurrentVersion/iF AND AuthenticationId_decimal=999  
+// Rename field for clarity  
+| rename(field = RegOperationType_decimal, as = RegOperationType)  
+// Match registry operations from CSV  
+| match(file="RegOperation.csv", field=[RegOperationName])  
+// Group by system, registry object, value, and operation, then count occurrences  
 | groupBy([ComputerName, RegObjectName, RegValueName, RegOperationName], function=count())
 ```
 
