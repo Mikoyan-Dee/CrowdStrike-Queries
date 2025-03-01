@@ -20,13 +20,19 @@ Note:
 
 ## Detect In-Memory .Net Assembly Modules Loaded from C2 Frameworks such as SilverC2, Metasploit. (MITRE ATTACK ID: T1055)
 
-```
+```Logscale
+//Filter for ImageHash Events
 event_simpleName=ImageHash
-| rename FileName as Dll_Loaded FilePath as Dll_Path
-| join TargetProcessId_decimal
-    [search event_simpleName=ProcessRollup* FileName!=powershell.exe]
-| search Dll_Loaded IN ("mscoree.dll", "clr.dll", "clrjit.dll", "mscorlib.ni.dll", "mscoreei.dll")
-| table ComputerName FileName CommandLine Dll_Loaded Dll_Path
+//Rename Fields for Readability
+| rename(field=[[FileName, Dll_Loaded], [FilePath, Dll_Path]])
+//Filter for non-PowerShell ImageHash events related to the same host and process
+| selfJoinFilter(field=[aid, TargetProcessId], where=[{#event_simpleName=/processrollup/iF}, {FileName!=/powershell\.exe/i}, {#event_simpleName=ImageHash}])
+//Filter for processes that invoke the .NET runtime, which can be a sign of suspicious activity like C#-based malware execution
+| in(field="Dll_Loaded", values=["mscoree.dll", "clr.dll", "clrjit.dll", "mscorlib.ni.dll", "mscoreei.dll"], ignoreCase=true)
+//Grouping by Host and Process
+| groupBy([aid, ComputerName, falconPID], function=([collect([FileName, CommandLine, Dll_Loaded, Dll_Path])]))
+//Display Results in Table Format
+| table([ComputerName, FileName, CommandLine, Dll_Loaded, Dll_Path])
 ```
 
 <br/>
